@@ -1,4 +1,16 @@
+#set par(spacing:8pt)
 #set text(blue)
+#set grid(
+	align: (x, y) => (
+		if x == 0 {left + bottom}
+		else {center + horizon}))
+#show grid.cell: it => {
+	if it.x == 0 or it.y == 0 {
+		set text(size:13pt)
+		it}
+	else {
+		set text(size:18pt)
+		it}}
 
 #let dec2hex(num) = {
 	let digits = "0123456789abcdef"
@@ -21,7 +33,8 @@
 	return rowIdx}
 
 #let unicode_printer_no_axis(start, end) = {
-	grid(columns:16, gutter:12pt, ..range(start, end).map(str.from-unicode))}
+	grid(columns:16, gutter:12pt,
+		..range(start, end).map(str.from-unicode))}
 
 #let unicode_printer(start, end) = {
 	let header = "0123456789abcdef".split("").slice(0,-1)
@@ -52,17 +65,29 @@
 
 		item.push(leader.at(rowIdx))
 
-		if middle >= end {middle = end}  // special case: last row
+		if middle >= end {middle = end}
 		item.push(range(start, middle).map(str.from-unicode))}
 
-	grid(columns:17, gutter:12pt, grid.header(..header), ..item.flatten())}
+	grid(columns:(1fr,)*17, row-gutter:6pt,
+		grid.header(..header),
+		..item.flatten())}
 
 //all unicode: (0, 1114096)  // 0000~10FFEF
-#unicode_printer(9728, 10064)  // 2600~274f
 //invalid unicode: (55296, 57344)  // d800~dfff
-#line(length:100%)
-#unicode_printer(61398, 62177)  // efd6~f2e0
-#line(length:100%)
-#unicode_printer(127744, 128765)  // 1f300~1f6fc
-#line(length:100%)
-#unicode_printer(129292, 129785)  // 1f90c~1faf8
+
+#let compose() = {
+	if sys.inputs.len() == 0 {
+		line(length:100%)
+		unicode_printer(9728, 10064)  // 2600~274f
+		line(length:100%)
+		unicode_printer(61398, 62177)  // efd6~f2e0
+		line(length:100%)
+		unicode_printer(127744, 128765)  // 1f300~1f6fc
+		line(length:100%)
+		unicode_printer(129292, 129785)}  // 1f90c~1faf8
+	else {
+		for (key, value) in sys.inputs {
+			line(length:100%)
+			unicode_printer(eval(key), eval(value))}}}
+
+#compose()

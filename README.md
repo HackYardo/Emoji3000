@@ -8,7 +8,7 @@ Not only Emoji, but also any Unicode char.
 # Dev
 ```sh
 typst compile some.typ  # gen some.pdf
-typst compile some.typ --input 0x0000=0x0def
+typst compile some.typ --input 0x00=0xc0 --input 0x1f980=0x1faf9
 ```
 ## License
 [GPL-3.0](LICENSE)
