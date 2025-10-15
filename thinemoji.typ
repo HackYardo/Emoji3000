@@ -6,7 +6,7 @@
 		else {center + horizon}))
 #show grid.cell: it => {
 	if it.x == 0 or it.y == 0 {
-		set text(size:13pt)
+		set text(black, size:13pt)
 		it}
 	else {
 		set text(size:18pt)
@@ -74,20 +74,32 @@
 
 //all unicode: (0, 1114096)  // 0000~10FFEF
 //invalid unicode: (55296, 57344)  // d800~dfff
+//unicode flags' letters: (127462, 127488)  // 1f1e6~1f1ff
+
+#let unicode_flags() = {
+	let resize(char) = {text(size:16pt, char)}
+	let r = range(127462, 127488).map(dec2hex)
+	let v = ("[]",)
+
+	for i in r {v.push("[\u{" + i + "}]")}  // header
+	for m in r {v.push("[\u{" + m + "}]")  // leader
+		for n in r {v.push("[\u{" + m + "}\u{" + n + "}]")}}
+
+	grid(columns:(1fr,)*27, row-gutter:2pt,
+		..v.map(eval).map(resize))}
 
 #let compose() = {
 	if sys.inputs.len() == 0 {
-		line(length:100%)
 		unicode_printer(9728, 10064)  // 2600~274f
-		line(length:100%)
 		unicode_printer(61398, 62177)  // efd6~f2e0
-		line(length:100%)
-		unicode_printer(127744, 128765)  // 1f300~1f6fc
-		line(length:100%)
-		unicode_printer(129292, 129785)}  // 1f90c~1faf8
+		unicode_printer(127744, 128592)  // 1f300~1f64f
+		unicode_printer(128640, 128765)  // 1f680~1f6fc
+		unicode_printer(129292, 129536)  // 1f90c~1f9ff
+		unicode_printer(129648, 129785)  // 1fa70~1faf8
+		unicode_printer(127462, 127488)  // 1f1e6~1f1ff
+		unicode_flags()}
 	else {
 		for (key, value) in sys.inputs {
-			line(length:100%)
 			unicode_printer(eval(key), eval(value))}}}
 
 #compose()
