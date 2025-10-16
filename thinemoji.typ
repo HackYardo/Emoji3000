@@ -79,13 +79,16 @@
 #let unicode_flags() = {
 	let resize(char) = {text(size:16pt, char)}
 	let r = range(127462, 127488).map(dec2hex)
-	let v = ("[]",)
+	let v = ()
 
-	for i in r {v.push("[\u{" + i + "}]")}  // header
+	let h = ("[]",)
+	for i in r {h.push("[\u{" + i + "}]")}  // header
+
 	for m in r {v.push("[\u{" + m + "}]")  // leader
 		for n in r {v.push("[\u{" + m + "}\u{" + n + "}]")}}
 
 	grid(columns:(1fr,)*27, row-gutter:2pt,
+		grid.header(..h.map(eval).map(resize)),
 		..v.map(eval).map(resize))}
 
 #let compose() = {
