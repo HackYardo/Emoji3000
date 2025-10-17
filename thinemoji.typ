@@ -94,7 +94,6 @@
 #let compose() = {
 	if sys.inputs.len() == 0 {
 		unicode_printer(9728, 10064)  // 2600~274f
-		unicode_printer(61398, 62177)  // efd6~f2e0
 		unicode_printer(127744, 128592)  // 1f300~1f64f
 		unicode_printer(128640, 128765)  // 1f680~1f6fc
 		unicode_printer(129292, 129536)  // 1f90c~1f9ff
