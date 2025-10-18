@@ -1,4 +1,4 @@
-#set par(spacing:8pt)
+#set par(spacing:12pt)
 #set text(blue)
 #set grid(
 	align: (x, y) => (
@@ -91,15 +91,30 @@
 		grid.header(..h.map(eval).map(resize)),
 		..v.map(eval).map(resize))}
 
+#let emoji_supplement() = {
+	grid(columns:(7fr,5fr,11fr,5fr,5fr),
+		grid(columns:(1.6em,)*3, row-gutter:1pt,
+			[],[a],[b],[231],[\u{231a}],[\u{231b}]),
+		grid(columns:(1.6em,)*2, row-gutter:1pt,
+			[],[8],[232],[\u{2328}]),
+		grid(columns:(1.6em,)*5, row-gutter:1pt,
+			[],[0],[1],[2],[3],
+			[23f],[\u{23f0}],[\u{23f1}],[\u{23f2}],[\u{23f3}]),
+		grid(columns:(1.6em,)*2, row-gutter:1pt,
+			[],[4],[276],[\u{2764}]),
+		grid(columns:(1.6em,)*2, row-gutter:1pt,
+			[],[0],[2b5],[\u{2b50}]))}
+
 #let compose() = {
 	if sys.inputs.len() == 0 {
+		emoji_supplement()  // 231a~b,2328,23f0~3,2764,2b50
 		unicode_printer(9728, 10064)  // 2600~274f
 		unicode_printer(127744, 128592)  // 1f300~1f64f
 		unicode_printer(128640, 128765)  // 1f680~1f6fc
 		unicode_printer(129292, 129536)  // 1f90c~1f9ff
 		unicode_printer(129648, 129785)  // 1fa70~1faf8
-		unicode_printer(127462, 127488)  // 1f1e6~1f1ff
-		unicode_flags()}
+		unicode_printer(127462, 127488)  // 1f1e6~1f1ff(A~Z)
+		unicode_flags()  /* AA~ZZ */}
 	else {
 		for (key, value) in sys.inputs {
 			unicode_printer(eval(key), eval(value))}}}
