@@ -91,6 +91,22 @@
 		grid.header(..h.map(eval).map(resize)),
 		..v.map(eval).map(resize))}
 
+#let emoji_modifier_sequence() = {
+	let resize(char) = {text(size:16pt, char)}
+	let M = range(0x1f385, 0x1f6cd).map(dec2hex)
+	let N = range(0x1f3fb, 0x1f400).map(dec2hex)
+	let v = ()
+
+	let h = ("[]",)
+	for i in N {h.push("[\u{" + i + "}]")}  // header
+
+	for m in M {v.push("[\u{" + m + "}]")  // leader
+		for n in N {v.push("[\u{" + m + "}\u{" + n + "}]")}}
+
+	grid(columns:(1fr,)*6, row-gutter:2pt,
+		grid.header(..h.map(eval)),
+		..v.map(eval))}
+
 #let emoji_supplement() = {
 	grid(columns:(7fr,5fr,11fr,5fr,5fr),
 		grid(columns:(1.6em,)*3, row-gutter:1pt,
@@ -107,14 +123,15 @@
 
 #let compose() = {
 	if sys.inputs.len() == 0 {
-		emoji_supplement()  // 231a~b,2328,23f0~3,2764,2b50
-		unicode_printer(9728, 10064)  // 2600~274f
-		unicode_printer(127744, 128592)  // 1f300~1f64f
-		unicode_printer(128640, 128765)  // 1f680~1f6fc
-		unicode_printer(129292, 129536)  // 1f90c~1f9ff
-		unicode_printer(129648, 129785)  // 1fa70~1faf8
+		//emoji_supplement()  // 231a~b,2328,23f0~3,2764,2b50
+		//unicode_printer(9728, 10064)  // 2600~274f
+		//unicode_printer(127744, 128592)  // 1f300~1f64f
+		//unicode_printer(128640, 128765)  // 1f680~1f6fc
+		//unicode_printer(129292, 129536)  // 1f90c~1f9ff
+		//unicode_printer(129648, 129785)  // 1fa70~1faf8
 		unicode_printer(127462, 127488)  // 1f1e6~1f1ff(A~Z)
-		unicode_flags()  /* AA~ZZ */}
+		unicode_flags()  /* AA~ZZ */
+		emoji_modifier_sequence()}
 	else {
 		for (key, value) in sys.inputs {
 			unicode_printer(eval(key), eval(value))}}}
