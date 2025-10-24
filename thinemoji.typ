@@ -79,7 +79,7 @@
 //invalid unicode: (55296, 57344)  // d800~dfff
 //unicode flags' letters: (127462, 127488)  // 1f1e6~1f1ff
 
-#let unicode_flags() = {
+#let emoji_flag_sequence() = {
 	let resize(char) = {text(size:16pt, char)}
 	let r = range(127462, 127488).map(dec2hex)
 	let v = ()
@@ -94,25 +94,78 @@
 		grid.header(..h.map(eval).map(resize)),
 		..v.map(eval).map(resize))}
 
+#let emoji_tag_sequence() = {
+	set text(size:16pt)
+	grid(columns:(3fr,1fr), row-gutter:6pt,
+		"1f3f4 e0067 e0062 e0065 e006E e0067 e007f",
+		[\u{1f3f4}\u{e0067}\u{e0062}\u{e0065}\u{e006e}\u{e0067}\u{e007f}],
+		"1f3f4 e0067 e0062 e0073 e0063 e0074 e007f",
+		[\u{1f3f4}\u{e0067}\u{e0062}\u{e0073}\u{e0063}\u{e0074}\u{e007f}],
+		"1f3f4 e0067 e0062 e0077 e006C e0073 e007f",
+		[\u{1f3f4}\u{e0067}\u{e0062}\u{e0077}\u{e006c}\u{e0073}\u{e007f}])}
+
+#let emoji_presentation_sequence() = {
+	let header = ("", "fe0e", "fe0f",)*4
+	let item = ("1fa8a", [\u{2615}\u{fe0e}], [\u{2615}\u{fe0f}],
+		"1fa8e", [\u{2604} \u{fe0e}], [\u{2604} \u{fe0f}],
+		"1fac8", [\u{1f341}\u{fe0e}], [\u{1f341}\u{fe0f}],
+		"1facd", [\u{1facd}\u{fe0e}], [\u{1facd}\u{fe0f}])
+
+	set grid(align: (x, y) => (
+		if calc.rem(x, 3) == 0 {right + bottom}
+		else {center + horizon}))
+	show grid.cell: it => {
+		if calc.rem(it.x, 3) == 0 or it.y == 0 {text(size:13pt, it)}
+		else {text(size:18pt, it)}}
+
+	grid(columns:(1fr,)*12, row-gutter:6pt,
+		grid.header(..header),
+		..item)}
+
+#let emoji_keycap_sequence() = {
+	let header = ("", "20e3", "", "20e3", "", "20e3", "...")
+	let item = ([\#], [\u{23}\u{20e3}], [\*], [\u{2a}\u{20e3}], [0\~9])
+	for num in range(0x30,0x3a) {
+		item.push([#str.from-unicode(num)\u{20e3}])}
+
+	set grid(align: (x, y) => (
+		if x in (0,2,4) {right + bottom}
+		else {center + horizon}))
+	show grid.cell: it => {
+		if it.x in (0,2,4) or it.y == 0 {text(size:13pt, it)}
+		else {text(size:18pt, it)}}
+
+	grid(columns:(1fr,)*15, row-gutter:6pt,
+		grid.header(..header),
+		..item)}
+
 #let emoji_modifier_sequence() = {
-	/*let resize(char) = {text(size:16pt, char)}
-	let M = range(0x1f385, 0x1f6cd)
-	let N = range(0x1f3fb, 0x1f400).map(str.from-unicode)
+	let c = range(0x1f3fb,0x1f400).map(str.from-unicode)
+	c.insert(0, "")
+	let header = c * 3
+
+	let leader = (0x261d, 0x26f9, range(0x270a,0x270e), 0x1f385,
+		range(0x1f3c2,0x1f3c5), 0x1f3c7, range(0x1f3ca,0x1f3cd), 0x1f442,
+		0x1f443, range(0x1f446,0x1f451), range(0x1f466,0x1f479), 0x1f47c,
+		range(0x1f481,0x1f484), range(0x1f485,0x1f488), 0x1f48f, 0x1f491,
+		0x1f4aa, 0x1f574, 0x1f575, 0x1f57a, 0x1f590, 0x1f595, 0x1f596,
+		range(0x1f645,0x1f648), range(0x1f64b,0x1f650), 0x1f6a3, 0x1f6b4,
+		0x1f6b5, 0x1f6b6, 0x1f6c0, 0x1f6cc, 0x1f90c, 0x1f90f,
+		range(0x1f918,0x1f920), 0x1f926, range(0x1f930,0x1f93a), 0x1f93c,
+		0x1f93d, 0x1f93e, 0x1f977, 0x1f9b5, 0x1f9b6, 0x1f9b8, 0x1f9b9,
+		0x1f9bb, range(0x1f9cd,0x1f9d0), range(0x1f9d1,0x1f9de), 0x1fac3,
+		0x1fac4, 0x1fac5, range(0x1faf0,0x1faf9)).flatten()
+
 	let item = ()
+	for l in leader {
+		let r = str.from-unicode(l)
+		item.push(dec2hex(l))
+		item.push(([#r#c.at(1)],[#r#c.at(2)],[#r#c.at(3)],
+			[#r#c.at(4)],[#r#c.at(5)]))}
 
-	let h = ("",)
-	for n in N {h.push(n)}  // header
-
-
-	for m in M {item.push(dec2hex(m))  // leader
-		for n in N {
-			m = str.from-unicode(int(m))
-			item.push([#n#m])}}
-
-	grid(columns:(1fr,)*6, row-gutter:2pt,
-		grid.header(..h),
-		..item)}*/
-	return str.codepoints("a")}
+	grid(columns:(1fr,)*18, row-gutter:6pt,
+		grid.header(..header.flatten()),
+		..item.flatten())}
 
 #let unicode_printer_segment(start, end) = {
 	end = end + 2
@@ -206,9 +259,15 @@
 		unicode_printer(129648, 129785)  // 1fa70~1faf8
 
 		unicode_printer(127462, 127488)  // 1f1e6~1f1ff(A~Z)
-		unicode_flags()  // AA~ZZ
+		emoji_flag_sequence()  // AA~ZZ
 
-		/*emoji_modifier_sequence()*/}
+		//emoji_tag_sequence()  // Default_Ignorable_Code_Point property
+
+		//emoji_presentation_sequence()  // Compatibility and Specials Area
+
+		emoji_keycap_sequence() // #,*,0~9
+
+		emoji_modifier_sequence()}
 	else {
 		for (key, value) in sys.inputs {
 			unicode_printer(eval(key), eval(value))}}}
