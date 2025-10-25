@@ -139,12 +139,31 @@
 		grid.header(..header),
 		..item)}
 
-#let emoji_modifier_sequence() = {
-	let c = range(0x1f3fb,0x1f400).map(str.from-unicode)
-	c.insert(0, "")
-	let header = c * 3
+#let emoji_modifier_sequence(modifier, emoji, col, zwj) = {
+	let m = modifier.map(str.from-unicode)
+	m.insert(0, "")
+	let header = m * 3
 
-	let leader = (0x261d, 0x26f9, range(0x270a,0x270e), 0x1f385,
+	let j = ""
+	if zwj != 0 {
+		j = str.from-unicode(zwj)
+		zwj = dec2hex(zwj)}
+	else {zwj = ""}
+
+	let item = ()
+	for k in emoji {
+		let e = str.from-unicode(k)
+		item.push([#dec2hex(k) #zwj])
+		for i in range(1, m.len()) {
+			item.push([#e#j#m.at(i)])}}
+
+	grid(columns:col, row-gutter:6pt,
+		grid.header(..header.flatten()),
+		..item.flatten())}
+
+#let emoji_skinTone_sequence() = {
+	let modifier = range(0x1f3fb,0x1f400)
+	let emoji = (0x261d, 0x26f9, range(0x270a,0x270e), 0x1f385,
 		range(0x1f3c2,0x1f3c5), 0x1f3c7, range(0x1f3ca,0x1f3cd), 0x1f442,
 		0x1f443, range(0x1f446,0x1f451), range(0x1f466,0x1f479), 0x1f47c,
 		range(0x1f481,0x1f484), range(0x1f485,0x1f488), 0x1f48f, 0x1f491,
@@ -155,17 +174,14 @@
 		0x1f93d, 0x1f93e, 0x1f977, 0x1f9b5, 0x1f9b6, 0x1f9b8, 0x1f9b9,
 		0x1f9bb, range(0x1f9cd,0x1f9d0), range(0x1f9d1,0x1f9de), 0x1fac3,
 		0x1fac4, 0x1fac5, range(0x1faf0,0x1faf9)).flatten()
+	emoji_modifier_sequence(modifier, emoji, 18, 0)}
 
-	let item = ()
-	for l in leader {
-		let r = str.from-unicode(l)
-		item.push(dec2hex(l))
-		item.push(([#r#c.at(1)],[#r#c.at(2)],[#r#c.at(3)],
-			[#r#c.at(4)],[#r#c.at(5)]))}
+#let emoji_hairdo_sequence() = {
+	let modifier = range(0x1f9b0,0x1f9b4)
+	let emoji = (0x1f468, 0x1f469, 0x1f9d1)
+	emoji_modifier_sequence(modifier, emoji, 15, 0x200d)}
 
-	grid(columns:(1fr,)*18, row-gutter:6pt,
-		grid.header(..header.flatten()),
-		..item.flatten())}
+#let emoji_skinToneHairdo_sequence() = {}
 
 #let unicode_printer_segment(start, end) = {
 	end = end + 2
@@ -250,7 +266,7 @@
 
 #let compose() = {
 	if sys.inputs.len() == 0 {
-		emoji_supplement()  // 231a~b,2328,23f0~3,2764,2b50,...
+		/*emoji_supplement()  // 231a~b,2328,23f0~3,2764,2b50,...
 
 		unicode_printer(9728, 10064)  // 2600~274f
 		unicode_printer(127744, 128592)  // 1f300~1f64f
@@ -265,9 +281,11 @@
 
 		//emoji_presentation_sequence()  // Compatibility and Specials Area
 
-		emoji_keycap_sequence() // #,*,0~9
+		emoji_keycap_sequence()  // #,*,0~9
 
-		emoji_modifier_sequence()}
+		emoji_skinTone_sequence()  // 1f3fb~1f3ff
+
+		*/emoji_hairdo_sequence()}  // 1f9b0~1f9b3
 	else {
 		for (key, value) in sys.inputs {
 			unicode_printer(eval(key), eval(value))}}}
